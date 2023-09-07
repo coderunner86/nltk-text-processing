@@ -11,6 +11,9 @@ nltk.download('stopwords')
 
 app = Flask(__name__)
 
+
+english_words = set(nltk.corpus.words.words())
+
 def preprocess_text(text):
     tokens = word_tokenize(text)
     stop_words = set(stopwords.words('english'))
