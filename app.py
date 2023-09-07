@@ -28,6 +28,19 @@ def calculate_similarity(input_str, target_str):
     similarity = intersection / union if union != 0 else 0.0
     return similarity
 
+def find_best_match(processed_input, custom_audiences):
+    best_match = 'None'
+    max_similarity = 0
+
+    for audience in custom_audiences:
+        similarity = calculate_similarity(processed_input, preprocess_text(audience))
+        if similarity > max_similarity:
+            max_similarity = similarity
+            best_match = audience
+
+    return best_match
+
+
 @app.route('/')
 def best_match_audience():
     try:
