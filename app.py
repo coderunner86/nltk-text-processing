@@ -8,7 +8,7 @@ from nltk.stem import WordNetLemmatizer
 nltk.download('words')
 nltk.download('punkt')
 nltk.download('stopwords')
-
+nltk.download('wordnet')
 app = Flask(__name__)
 
 
