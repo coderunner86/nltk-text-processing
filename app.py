@@ -1,25 +1,16 @@
 import nltk
 import json
-import random
 from flask import Flask, request, jsonify
-
-nltk.download('words')
-nltk.download('punkt')
-
-app = Flask(__name__)
-
-english_words = set(nltk.corpus.words.words())
-
-# Generate a random audience
-@app.route('/')
-def generate_random_audience():
-    import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+
 nltk.download('words')
 nltk.download('punkt')
 nltk.download('stopwords')
+
+app = Flask(__name__)
+
 def preprocess_text(text):
     tokens = word_tokenize(text)
     stop_words = set(stopwords.words('english'))
@@ -34,18 +25,25 @@ def calculate_similarity(input_str, target_str):
     similarity = intersection / union if union != 0 else 0.0
     return similarity
 
-def find_best_match(processed_input, custom_audiences):
-    best_match = 'None'
-    max_similarity = 0
+@app.route('/')
+def best_match_audience():
+    try:
+        # Obtener la palabra y la lista de audiencias de la query string
+        input_word = request.args.get('word', '')
+        input_audiences = request.args.getlist('audiences')
 
-    for audience in custom_audiences:
-        similarity = calculate_similarity(processed_input, preprocess_text(audience))
-        if similarity > max_similarity:
-            max_similarity = similarity
-            best_match = audience
+        if not input_word or not input_audiences:
+            return jsonify({"error": "Word and Audiences are required in query string"})
 
-    return best_match
+        # Procesar la palabra de entrada
+        processed_word = preprocess_text(input_word)
 
+        # Encontrar el mejor match en la lista de audiencias
+        best_match = find_best_match(processed_word, input_audiences)
+
+        return jsonify({"best_match": best_match})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
     app.run(port=5001, debug=False)
